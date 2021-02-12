@@ -73,7 +73,7 @@ jobs:
       - name: Set composer version
         id: composer-version
         run: |
-          if [ ${{ matrix.dependency-version == 'prefer-stable' }} = 'prefer-stable' ]; then
+          if [ ${{ matrix.dependency-version == 'prefer-stable' }} ]; then
             echo '::set-output name=version::v2'
           else
             echo '::set-output name=version::v1'
