@@ -75,7 +75,7 @@
 			switch_theme('twentytwentyone');
 			$context = Timber::context();
 			$output = Timber::compile_string('{{site.theme.get("Name")}}', $context);
-			$this->assertEquals('twentytwentyone', $output);
+			$this->assertEquals('Twenty Twenty-One', $output);
 			switch_theme('default');
 		}
 
