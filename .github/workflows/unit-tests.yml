@@ -70,12 +70,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Set composer version
+        id: composer-version
+        run: |
+          if [ ${{ matrix.dependency-version == 'prefer-stable' }} = 'prefer-stable' ]; then
+            echo '::set-output name=version::v2'
+          else
+            echo '::set-output name=version::v1'
+          fi
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           coverage: none  # XDebug can be enabled here 'coverage: xdebug'
-          tools: composer:${{ matrix.dependency-version == 'prefer-stable' && 'v2' || 'v1' }}
+          tools: composer:${{ steps.composer-version.outputs.version }}
           extensions: ${{ matrix.extensions }}
 
       - name: Shutdown default MySQL service
@@ -95,7 +104,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-${{ steps.composer-version.outputs.version }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
