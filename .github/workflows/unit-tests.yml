@@ -79,8 +79,6 @@ jobs:
             echo '::set-output name=version::v1'
           fi
 
-      - run: echo ${{ steps.composer-version.outputs.version }}
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -89,38 +87,38 @@ jobs:
           tools: composer:${{ steps.composer-version.outputs.version }}
           extensions: ${{ matrix.extensions }}
 
-      # - name: Shutdown default MySQL service
-      #   run: sudo service mysql stop
+      - name: Shutdown default MySQL service
+        run: sudo service mysql stop
 
-      # - name: Verify MariaDB connection
-      #   run: |
-      #     while ! mysqladmin ping -h"127.0.0.1" -P"${{ job.services.mysql.ports[3306] }}" --silent; do
-      #       sleep 1
-      #     done
+      - name: Verify MariaDB connection
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" -P"${{ job.services.mysql.ports[3306] }}" --silent; do
+            sleep 1
+          done
 
-      # - name: Get composer cache directory
-      #   id: composer-cache
-      #   run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
-      # - name: Cache composer dependencies
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: ${{ steps.composer-cache.outputs.dir }}
-      #     key: ${{ runner.os }}-${{ steps.composer-version.outputs.version }}-composer-${{ hashFiles('**/composer.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-composer-
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-${{ steps.composer-version.outputs.version }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-      # - name: Install composer dependencies
-      #   run: composer update --${{ matrix.dependency-version }} --prefer-dist --ignore-platform-reqs --no-progress --no-interaction
+      - name: Install composer dependencies
+        run: composer update --${{ matrix.dependency-version }} --prefer-dist --ignore-platform-reqs --no-progress --no-interaction
 
-      # - name: Install tests
-      #   run: bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1:${{ job.services.mysql.ports['3306'] }} ${{ matrix.wp }} true
+      - name: Install tests
+        run: bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1:${{ job.services.mysql.ports['3306'] }} ${{ matrix.wp }} true
 
-      # - name: Run tests
-      #   if: ${{ !matrix.webp }}
-      #   run: composer run test-unit
-      #   env:
-      #     WP_MULTISITE: ${{ matrix.multisite }}
-      # - name: Run webp tests
-      #   if: ${{ matrix.webp }}
-      #   run: vendor/phpunit/phpunit/phpunit -c phpunit.xml --verbose ./tests/test-timber-image-towebp.php
+      - name: Run tests
+        if: ${{ !matrix.webp }}
+        run: composer run test-unit
+        env:
+          WP_MULTISITE: ${{ matrix.multisite }}
+      - name: Run webp tests
+        if: ${{ matrix.webp }}
+        run: vendor/phpunit/phpunit/phpunit -c phpunit.xml --verbose ./tests/test-timber-image-towebp.php
