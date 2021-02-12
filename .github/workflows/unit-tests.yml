@@ -75,7 +75,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: none  # XDebug can be enabled here 'coverage: xdebug'
-          tools: composer:v2
+          tools: composer:${{ matrix.dependency-version == 'prefer-stable' && 'v2' || 'v1' }}
           extensions: ${{ matrix.extensions }}
 
       - name: Shutdown default MySQL service
