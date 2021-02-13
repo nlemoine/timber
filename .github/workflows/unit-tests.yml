@@ -115,7 +115,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install composer dependencies
-        run: composer update --${{ matrix.dependency-version }} --prefer-dist --ignore-platform-reqs --no-progress --no-interaction
+        run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-progress --no-interaction
 
       - name: Install tests
         run: bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1:${{ job.services.mysql.ports['3306'] }} ${{ matrix.wp }} true
