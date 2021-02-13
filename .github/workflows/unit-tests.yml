@@ -26,9 +26,9 @@ jobs:
       fail-fast: false
       matrix:
         php: ['7.4', '7.3', '7.2']
-        wp: ['latest']
+        wp: ['latest', '4.9.8']
         multisite: ['0', '1']
-        dependency-version: [prefer-stable]
+        dependency-version: [prefer-stable, 'prefer-lowest']
         webp: [false]
         include:
           - php: '5.6'
