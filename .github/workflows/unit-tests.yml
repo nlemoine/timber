@@ -47,12 +47,12 @@ jobs:
             wp: '4.9.8'
             dependency-version: 'prefer-lowest'
             webp: false
-          - php: '7.4'
-            wp: 'latest'
-            dependency-version: 'prefer-stable'
-            extensions: imagick
-            multisite: '0'
-            webp: false
+          # - php: '7.4'
+          #   wp: 'latest'
+          #   dependency-version: 'prefer-stable'
+          #   extensions: imagick
+          #   multisite: '0'
+          #   webp: false
           - php: '7.4'
             wp: 'latest'
             dependency-version: 'prefer-stable'
@@ -64,7 +64,9 @@ jobs:
             multisite: '0'
             webp: true
 
-    name: PHP ${{ matrix.php }} ${{ matrix.extensions && ' (with ' || '' }} ${{ matrix.extensions && matrix.extensions || '' }}${{ matrix.extensions && ')' || '' }}${{ matrix.webp && ' (webp)' || '' }} | WP ${{ matrix.wp }}${{ matrix.multisite == 1 && ' (MS)' || '' }} | ${{ matrix.dependency-version }}
+    name: PHP ${{ matrix.php }} ${{ matrix.extensions && ' (with ' || '' }} ${{ matrix.webp && ' (webp)' || '' }} | WP ${{ matrix.wp }}${{ matrix.multisite == 1 && ' (MS)' || '' }} | ${{ matrix.dependency-version }}
+
+    #${{ matrix.extensions && matrix.extensions || '' }}${{ matrix.extensions && ')' || '' }}
 
     steps:
       - name: Checkout
@@ -85,7 +87,7 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none  # XDebug can be enabled here 'coverage: xdebug'
           tools: composer:${{ steps.composer-version.outputs.version }}
-          extensions: ${{ matrix.extensions }}
+          extensions: curl, date, dom, gd, iconv, json, libxml, mysql, spl
 
       - name: Shutdown default MySQL service
         run: sudo service mysql stop
