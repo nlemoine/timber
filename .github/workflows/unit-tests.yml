@@ -25,44 +25,44 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['7.4', '7.3']
+        php: ['7.4', '7.3', '7.2']
         wp: ['latest']
         multisite: ['0', '1']
         dependency-version: [prefer-stable]
         webp: [false]
-        # include:
-        #   - php: '5.6'
-        #     wp: '4.9.8'
-        #     dependency-version: 'prefer-lowest'
-        #     webp: false
-        #   - php: '7.0'
-        #     wp: '4.9.8'
-        #     dependency-version: 'prefer-lowest'
-        #     webp: false
-        #   - php: '7.1'
-        #     wp: '4.9.8'
-        #     dependency-version: 'prefer-lowest'
-        #     webp: false
-        #   - php: '7.2'
-        #     wp: '4.9.8'
-        #     dependency-version: 'prefer-lowest'
-        #     webp: false
-        #   - php: '7.4'
-        #     wp: 'latest'
-        #     dependency-version: 'prefer-stable'
-        #     extensions: imagick
-        #     multisite: '0'
-        #     webp: false
-        #   - php: '7.4'
-        #     wp: 'latest'
-        #     dependency-version: 'prefer-stable'
-        #     multisite: '0'
-        #     webp: false
-        #   - php: '7.4'
-        #     wp: 'latest'
-        #     dependency-version: 'prefer-stable'
-        #     multisite: '0'
-        #     webp: true
+        include:
+          - php: '5.6'
+            wp: '4.9.8'
+            dependency-version: 'prefer-lowest'
+            webp: false
+          - php: '7.0'
+            wp: '4.9.8'
+            dependency-version: 'prefer-lowest'
+            webp: false
+          - php: '7.1'
+            wp: '4.9.8'
+            dependency-version: 'prefer-lowest'
+            webp: false
+          - php: '7.2'
+            wp: '4.9.8'
+            dependency-version: 'prefer-lowest'
+            webp: false
+          - php: '7.4'
+            wp: 'latest'
+            dependency-version: 'prefer-stable'
+            extensions: imagick
+            multisite: '0'
+            webp: false
+          - php: '7.4'
+            wp: 'latest'
+            dependency-version: 'prefer-stable'
+            multisite: '0'
+            webp: false
+          - php: '7.4'
+            wp: 'latest'
+            dependency-version: 'prefer-stable'
+            multisite: '0'
+            webp: true
 
     name: PHP ${{ matrix.php }} ${{ matrix.extensions && ' (with ' || '' }} ${{ matrix.extensions && matrix.extensions || '' }}${{ matrix.extensions && ')' || '' }}${{ matrix.webp && ' (webp)' || '' }} | WP ${{ matrix.wp }}${{ matrix.multisite == 1 && ' (MS)' || '' }} | ${{ matrix.dependency-version }}
 
