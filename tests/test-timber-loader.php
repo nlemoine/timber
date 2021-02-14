@@ -10,15 +10,23 @@
 		    });
 		    $str = Timber::compile('assets/single.twig', array());
 		}
-				
+
 		function testBogusTemplate() {
+			// disable logging in tests
+			global $timber_disable_error_log;
+			$timber_disable_error_log = true;
 			$str = Timber::compile('assets/darkhelmet.twig');
 			$this->assertFalse($str);
+			$timber_disable_error_log = false;
 		}
 
 		function testBogusTemplates() {
+			// disable logging in tests
+			global $timber_disable_error_log;
+			$timber_disable_error_log = true;
 			$str = Timber::compile( array('assets/barf.twig', 'assets/lonestar.twig') );
 			$this->assertFalse($str);
+			$timber_disable_error_log = false;
 		}
 
 		function testTemplateChainWithMissingTwigFiles() {
