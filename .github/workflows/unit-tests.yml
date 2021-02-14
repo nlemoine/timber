@@ -28,7 +28,7 @@ jobs:
         php: ['7.4', '7.0']
         wp: ['latest']
         multisite: ['0']
-        dependency-version: [prefer-stable, 'prefer-lowest']
+        dependency-version: [prefer-stable]
         webp: [false]
         include:
           - php: '7.4'
@@ -93,23 +93,23 @@ jobs:
             sleep 1
           done
 
-      # - name: Setup problem matchers for PHP
-      #   run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-      # - name: Setup problem matchers for PHPUnit
-      #   run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
-      # - name: Get composer cache directory
-      #   id: composer-cache
-      #   run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
-      # - name: Cache composer dependencies
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: ${{ steps.composer-cache.outputs.dir }}
-      #     key: ${{ runner.os }}-${{ matrix.dependency-version }}-composer-${{ hashFiles('**/composer.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-${{ matrix.dependency-version }}-composer-
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-${{ matrix.dependency-version }}-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.dependency-version }}-${{ matrix.php }}-composer-
 
       - name: Install composer dependencies
         run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-progress --no-interaction
