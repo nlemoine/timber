@@ -99,17 +99,17 @@ jobs:
       - name: Setup problem matchers for PHPUnit
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      # - name: Get composer cache directory
+      #   id: composer-cache
+      #   run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
-      - name: Cache composer dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-${{ matrix.dependency-version }}-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.dependency-version }}-${{ matrix.php }}-composer-
+      # - name: Cache composer dependencies
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: ${{ steps.composer-cache.outputs.dir }}
+      #     key: ${{ runner.os }}-${{ matrix.dependency-version }}-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-${{ matrix.dependency-version }}-${{ matrix.php }}-composer-
 
       - name: Install composer dependencies
         run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-progress --no-interaction
