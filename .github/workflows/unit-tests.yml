@@ -82,7 +82,7 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none  # XDebug can be enabled here 'coverage: xdebug'
           tools: composer:v2
-          extensions: curl, date, dom, gd, iconv, json, libxml, mysql, spl
+          extensions: curl, date, dom, gd, iconv, json, libxml, mysql
 
       - name: Shutdown default MySQL service
         run: sudo service mysql stop
