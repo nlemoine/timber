@@ -1,0 +1,123 @@
+name: Timber Tests
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mariadb:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_ROOT_PASSWORD:
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '7.2']
+        wp: ['5.3.6', 'latest']
+        multisite: ['0']
+        dependency-version: [prefer-stable, 'prefer-lowest']
+        webp: [false]
+        include:
+          - php: '7.4'
+            wp: 'latest'
+            dependency-version: 'prefer-stable'
+            multisite: '1'
+        #   - php: '7.0'
+        #     wp: '4.9.8'
+        #     dependency-version: 'prefer-lowest'
+        #     webp: false
+        #   - php: '7.1'
+        #     wp: '4.9.8'
+        #     dependency-version: 'prefer-lowest'
+        #     webp: false
+        #   - php: '7.2'
+        #     wp: '4.9.8'
+        #     dependency-version: 'prefer-lowest'
+        #     webp: false
+        #   # - php: '7.4'
+        #   #   wp: 'latest'
+        #   #   dependency-version: 'prefer-stable'
+        #   #   extensions: imagick
+        #   #   multisite: '0'
+        #   #   webp: false
+        #   - php: '7.4'
+        #     wp: 'latest'
+        #     dependency-version: 'prefer-stable'
+        #     multisite: '0'
+        #     webp: false
+        #   - php: '7.4'
+        #     wp: 'latest'
+        #     dependency-version: 'prefer-stable'
+        #     multisite: '0'
+        #     webp: true
+
+    name: PHP ${{ matrix.php }} ${{ matrix.extensions && ' (with ' || '' }} ${{ matrix.webp && ' (webp)' || '' }} | WP ${{ matrix.wp }}${{ matrix.multisite == 1 && ' (MS)' || '' }} | ${{ matrix.dependency-version }}
+
+    #${{ matrix.extensions && matrix.extensions || '' }}${{ matrix.extensions && ')' || '' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none  # XDebug can be enabled here 'coverage: xdebug'
+          tools: composer:v2
+          extensions: curl, date, dom, gd, iconv, json, libxml, mysql
+
+      - name: Shutdown default MySQL service
+        run: sudo service mysql stop
+
+      - name: Verify MariaDB connection
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" -P"${{ job.services.mysql.ports[3306] }}" --silent; do
+            sleep 1
+          done
+
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      # - name: Get composer cache directory
+      #   id: composer-cache
+      #   run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      # - name: Cache composer dependencies
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: ${{ steps.composer-cache.outputs.dir }}
+      #     key: ${{ runner.os }}-${{ matrix.dependency-version }}-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-${{ matrix.dependency-version }}-${{ matrix.php }}-composer-
+
+      - name: Install composer dependencies
+        run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-progress --no-interaction
+
+      - name: Install tests
+        run: bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1:${{ job.services.mysql.ports['3306'] }} ${{ matrix.wp }} true
+
+      - name: Run tests
+        if: ${{ !matrix.webp }}
+        run: composer run test-unit
+        env:
+          WP_MULTISITE: ${{ matrix.multisite }}
+      - name: Run webp tests
+        if: ${{ matrix.webp }}
+        run: vendor/phpunit/phpunit/phpunit -c phpunit.xml --verbose ./tests/test-timber-image-towebp.php
