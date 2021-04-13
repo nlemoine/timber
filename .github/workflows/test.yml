@@ -33,6 +33,7 @@ jobs:
         dependency-version: [prefer-stable] # prefer-lowest
         webp: [false]
         coverage: [false]
+        extensions: ['gd']
         include:
           # WP Trunk
           - php: '7.4'
@@ -40,6 +41,12 @@ jobs:
             dependency-version: 'prefer-stable'
             multisite: '0'
             experimental: true
+          # WP Trunk
+          - php: '7.4'
+            wp: 'latest'
+            dependency-version: 'prefer-stable'
+            multisite: '0'
+            extensions: 'imagick'
           # Coverage
           - php: '7.4'
             wp: 'latest'
@@ -47,7 +54,7 @@ jobs:
             multisite: '0'
             coverage: true
 
-    name: PHP ${{ matrix.php }} ${{ matrix.coverage && ' (with coverage)' || '' }} ${{ matrix.webp && ' (webp)' || '' }} | WP ${{ matrix.wp }}${{ matrix.multisite == 1 && ' (MS)' || '' }} | ${{ matrix.dependency-version }}
+    name: PHP ${{ matrix.php }} ${{ matrix.extensions == 'imagick' && ' (Imagick)' || '' }}${{ matrix.coverage && ' (with coverage)' || '' }} ${{ matrix.webp && ' (webp)' || '' }} | WP ${{ matrix.wp }}${{ matrix.multisite == 1 && ' (MS)' || '' }} | ${{ matrix.dependency-version }}
 
     steps:
       - name: Checkout
@@ -59,7 +66,7 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: ${{ matrix.coverage && 'pcov' || 'none' }}
           tools: composer:v2
-          extensions: curl, date, dom, gd, iconv, json, libxml, mysql
+          extensions: curl, date, dom, iconv, json, libxml, mysql, ${{ matrix.extensions }}
           ini-values: pcov.directory=lib
 
       - name: Shutdown default MySQL service
